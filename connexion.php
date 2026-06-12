@@ -21,7 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['id_utilisateur'] = $utilisateur['id_utilisateur'];
         $_SESSION['prenom'] = $utilisateur['prenom'];
         $_SESSION['role'] = $utilisateur['libelle_role'];
-        header('Location: index.php');
+        $redirect = $_GET['redirect'] ?? $_POST['redirect'] ?? 'index.php';
+        header('Location: ' . $redirect);
         exit;
     }
     // Message volontairement vague : ne pas révéler si l'email existe
@@ -50,6 +51,7 @@ require 'includes/header.php';
         <label class="form-label" for="mot_de_passe">Mot de passe</label>
         <input class="form-control" type="password" id="mot_de_passe" name="mot_de_passe" required>
     </div>
+    <input type="hidden" name="redirect" value="<?= htmlspecialchars($_GET['redirect'] ?? 'index.php') ?>">
     <button class="btn btn-primary" type="submit">Se connecter</button>
 </form>
 
