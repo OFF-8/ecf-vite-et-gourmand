@@ -22,7 +22,11 @@
                     <li class="nav-item"><a class="nav-link" href="index.php">Accueil</a></li>
                     <li class="nav-item"><a class="nav-link" href="menus.php">Nos menus</a></li>
                     <li class="nav-item"><a class="nav-link" href="contact.php">Contact</a></li>
-                    <?php if (isset($_SESSION['id_utilisateur'])): ?>
+                    
+                    <?php if (in_array($_SESSION['role'] ?? '', ['employe', 'administrateur'], true)): ?>
+    <li class="nav-item"><a class="nav-link" href="employe/index.php">Espace employé</a></li>
+<?php endif; ?>
+<?php if (isset($_SESSION['id_utilisateur'])): ?>
     <li class="nav-item"><a class="nav-link" href="mon-espace.php">Bonjour <?= htmlspecialchars($_SESSION['prenom']) ?></a></li>
     <li class="nav-item"><a class="nav-link" href="deconnexion.php">Déconnexion</a></li>
 <?php else: ?>
