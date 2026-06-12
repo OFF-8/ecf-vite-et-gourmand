@@ -53,6 +53,7 @@ require 'includes/header.php';
     </div>
     <input type="hidden" name="redirect" value="<?= htmlspecialchars($_GET['redirect'] ?? 'index.php') ?>">
     <button class="btn btn-primary" type="submit">Se connecter</button>
+    <p class="mt-2"><a href="mot-de-passe-oublie.php">Mot de passe oublié ?</a></p>
 </form>
 
 <p class="mt-3">Pas encore de compte ? <a href="inscription.php">Créez-en un</a>.</p>
