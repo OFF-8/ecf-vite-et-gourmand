@@ -22,7 +22,9 @@
                     <li class="nav-item"><a class="nav-link" href="index.php">Accueil</a></li>
                     <li class="nav-item"><a class="nav-link" href="menus.php">Nos menus</a></li>
                     <li class="nav-item"><a class="nav-link" href="contact.php">Contact</a></li>
-                    
+                    <?php if (($_SESSION['role'] ?? '') === 'administrateur'): ?>
+    <li class="nav-item"><a class="nav-link" href="admin/index.php">Espace admin</a></li>
+<?php endif; ?>                    
                     <?php if (in_array($_SESSION['role'] ?? '', ['employe', 'administrateur'], true)): ?>
     <li class="nav-item"><a class="nav-link" href="employe/index.php">Espace employé</a></li>
 <?php endif; ?>

@@ -140,6 +140,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute(['id' => $idMenuPost]);
 
             $pdo->commit();
+            require_once 'includes/enregistrer-stat-commande.php';
+            enregistrerStatCommande($idCommande, $idMenuPost, $menu['titre'], $prixTotal);
             $succes = true;
             // TODO : mail de confirmation
         } catch (Exception $e) {
