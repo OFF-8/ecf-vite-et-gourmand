@@ -25,7 +25,15 @@ function getDatabaseParams(): array
     $fromUrl = false;
     $proxyHost = null;
 
-    if ($databaseUrl) {
+    // Variables séparées explicites (Vercel) : prioritaires sur DATABASE_URL
+    $explicitHost = env('DB_HOST');
+    $useDiscrete = isCloudEnvironment()
+        && $explicitHost !== null
+        && $explicitHost !== ''
+        && $explicitHost !== 'localhost'
+        && str_contains($explicitHost, 'proxy.rlwy.net');
+
+    if (!$useDiscrete && $databaseUrl) {
         $parts = parse_url($databaseUrl);
         if (is_array($parts) && !empty($parts['host'])) {
             $host = $parts['host'];
@@ -65,7 +73,7 @@ function getDatabaseParams(): array
         }
     }
 
-    if (isCloudEnvironment() && !$fromUrl && !env('MYSQLHOST') && !$proxyHost) {
+    if (isCloudEnvironment() && !$fromUrl && !$useDiscrete && !env('MYSQLHOST') && !$proxyHost) {
         throw new RuntimeException(
             'DATABASE_URL manquant. Railway → TCP Proxy activé → copiez MYSQL_PUBLIC_URL (proxy.rlwy.net + port type 18432).'
         );
