@@ -4,7 +4,8 @@ function isCloudEnvironment(): bool
 {
     return env('VERCEL') === '1'
         || env('FLY_APP_NAME') !== null
-        || env('RENDER') === 'true';
+        || env('RENDER') === 'true'
+        || env('RAILWAY_ENVIRONMENT') !== null;
 }
 
 /**
