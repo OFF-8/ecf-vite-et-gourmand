@@ -9,6 +9,7 @@ chdir(APP_ROOT);
 
 require_once APP_ROOT . '/config/env.php';
 require_once APP_ROOT . '/config/app.php';
+require_once APP_ROOT . '/config/db-params.php';
 
 header('Content-Type: text/html; charset=UTF-8');
 
@@ -18,41 +19,23 @@ if (($_GET['key'] ?? '') !== $installKey) {
     exit('<h1>Installation</h1><p>URL : <code>/install.php?key=vitegourmand2026</code></p>');
 }
 
-$host = env('DB_HOST', 'localhost');
-$port = env('DB_PORT', '3306');
-$dbname = env('DB_NAME', 'vite_et_gourmand');
-$user = env('DB_USER', 'root');
-$password = env('DB_PASSWORD', '');
-
-$databaseUrl = env('DATABASE_URL') ?? env('MYSQL_PUBLIC_URL') ?? env('MYSQL_URL');
-if ($databaseUrl) {
-    $parts = parse_url($databaseUrl);
-    if (is_array($parts)) {
-        $host = $parts['host'] ?? $host;
-        $port = (string) ($parts['port'] ?? $port);
-        $user = $parts['user'] ?? $user;
-        $password = $parts['pass'] ?? $password;
-    }
+try {
+    $params = getDatabaseParams();
+} catch (RuntimeException $e) {
+    $params = null;
+    $erreur = $e->getMessage();
 }
 
-$options = [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_TIMEOUT => 10,
-];
+$options = getDatabasePdoOptions();
+$options[PDO::ATTR_TIMEOUT] = 15;
 
-$useSsl = env('DB_SSL', '0');
-$isLocal = in_array($host, ['localhost', '127.0.0.1', 'db'], true);
-if ($useSsl === '1') {
-    if (PHP_VERSION_ID >= 80400) {
-        $options[\Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT] = false;
-    } elseif (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
-        $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
-    }
-}
-
-function installConnect(string $host, string $port, string $user, string $password, ?string $dbname, array $options): PDO
+function installConnect(?array $params, ?string $dbname, array $options): PDO
 {
+    $host = $params['host'];
+    $port = $params['port'];
+    $user = $params['user'];
+    $password = $params['password'];
+
     $dsn = "mysql:host=$host;port=$port;charset=utf8mb4;allowPublicKeyRetrieval=true";
     if ($dbname) {
         $dsn .= ";dbname=$dbname";
@@ -83,27 +66,29 @@ function installRunSql(PDO $pdo, string $path): void
 }
 
 $messages = [];
-$erreur = '';
+$erreur = $erreur ?? '';
 
+if ($params) {
 try {
     try {
-        $pdo = installConnect($host, $port, $user, $password, $dbname, $options);
+        $pdo = installConnect($params, $params['dbname'], $options);
         if (installIsDone($pdo)) {
-            $messages[] = "La base <strong>$dbname</strong> est déjà installée.";
+            $messages[] = "La base <strong>{$params['dbname']}</strong> est déjà installée.";
         } else {
             throw new PDOException('Base vide');
         }
     } catch (PDOException) {
-        $pdo = installConnect($host, $port, $user, $password, null, $options);
+        $pdo = installConnect($params, null, $options);
         installRunSql($pdo, APP_ROOT . '/sql/creation_bdd.sql');
         $messages[] = 'Schéma créé.';
-        $pdo = installConnect($host, $port, $user, $password, $dbname, $options);
+        $pdo = installConnect($params, $params['dbname'], $options);
         installRunSql($pdo, APP_ROOT . '/sql/fixtures.sql');
         $messages[] = 'Données importées.';
         $messages[] = 'Installation terminée.';
     }
 } catch (Throwable $e) {
     $erreur = $e->getMessage();
+}
 }
 
 $baseUrl = getBasePath();
@@ -120,8 +105,10 @@ $baseUrl = getBasePath();
 
     <?php if ($erreur): ?>
         <div class="alert alert-danger"><?= htmlspecialchars($erreur) ?></div>
-        <p>Sur Railway : activez <strong>TCP Proxy</strong> et utilisez l'URL avec <code>proxy.rlwy.net</code> et un port type <code>12345</code> (pas forcément 3306).</p>
-        <p>Sur Vercel : <code>DATABASE_URL</code> = URL publique Railway, <code>DB_NAME=vite_et_gourmand</code>, <code>DB_SSL=0</code></p>
+        <p><strong>Fly.io :</strong></p>
+        <pre>fly secrets set DATABASE_URL="mysql://root:PASS@xxx.proxy.rlwy.net:PORT/railway"
+fly secrets set DB_NAME=vite_et_gourmand</pre>
+        <p><strong>Vercel :</strong> DATABASE_URL + DB_NAME=vite_et_gourmand + DB_SSL=0</p>
     <?php else: ?>
         <?php foreach ($messages as $message): ?>
             <div class="alert alert-success"><?= $message ?></div>
