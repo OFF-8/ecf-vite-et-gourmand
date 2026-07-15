@@ -2,6 +2,6 @@
   "name": "ecf-vite-et-gourmand",
   "private": true,
   "scripts": {
-    "vercel-build": "mkdir -p public/asset && cp -r asset/* public/asset/"
+    "vercel-build": "git clone --depth 1 https://github.com/PHPMailer/PHPMailer.git vendor/phpmailer/phpmailer && mkdir -p public/asset && cp -r asset/* public/asset/"
   }
 }
