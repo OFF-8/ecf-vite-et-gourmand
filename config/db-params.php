@@ -18,12 +18,17 @@ function getDatabaseParams(): array
     $user = env('DB_USER', 'root');
     $password = env('DB_PASSWORD', '');
 
-    $databaseUrl = env('DATABASE_URL') ?? env('MYSQL_PUBLIC_URL') ?? env('MYSQL_URL');
+    $databaseUrl = env('DATABASE_URL')
+        ?? env('MYSQL_PUBLIC_URL')
+        ?? env('MYSQL_URL');
+
+    $fromUrl = false;
+    $proxyHost = null;
 
     if ($databaseUrl) {
         $parts = parse_url($databaseUrl);
-        if (is_array($parts)) {
-            $host = $parts['host'] ?? $host;
+        if (is_array($parts) && !empty($parts['host'])) {
+            $host = $parts['host'];
             $port = (string) ($parts['port'] ?? $port);
             $user = isset($parts['user']) ? rawurldecode($parts['user']) : $user;
             $password = isset($parts['pass']) ? rawurldecode($parts['pass']) : $password;
@@ -31,28 +36,38 @@ function getDatabaseParams(): array
             if ($urlDb !== '') {
                 $dbname = $urlDb;
             }
+            $fromUrl = true;
         }
     }
 
-    if ($railwayHost = env('MYSQLHOST') ?? env('MYSQL_HOST')) {
-        $host = $railwayHost;
-    }
-    if ($railwayPort = env('MYSQLPORT') ?? env('MYSQL_PORT')) {
-        $port = (string) $railwayPort;
-    }
-    if ($railwayUser = env('MYSQLUSER') ?? env('MYSQL_USER')) {
-        $user = $railwayUser;
-    }
-    if ($railwayPass = env('MYSQLPASSWORD') ?? env('MYSQL_PASSWORD')) {
-        $password = $railwayPass;
-    }
-    if ($railwayDb = env('MYSQLDATABASE') ?? env('MYSQL_DATABASE')) {
-        $dbname = $railwayDb;
+    if (!$fromUrl) {
+        $proxyHost = env('RAILWAY_TCP_PROXY_DOMAIN');
+        $proxyPort = env('RAILWAY_TCP_PROXY_PORT');
+        if ($proxyHost && $proxyPort) {
+            $host = $proxyHost;
+            $port = (string) $proxyPort;
+        }
+
+        if ($railwayHost = env('MYSQLHOST') ?? env('MYSQL_HOST')) {
+            $host = $railwayHost;
+        }
+        if ($railwayPort = env('MYSQLPORT') ?? env('MYSQL_PORT')) {
+            $port = (string) $railwayPort;
+        }
+        if ($railwayUser = env('MYSQLUSER') ?? env('MYSQL_USER')) {
+            $user = $railwayUser;
+        }
+        if ($railwayPass = env('MYSQLPASSWORD') ?? env('MYSQL_PASSWORD')) {
+            $password = $railwayPass;
+        }
+        if ($railwayDb = env('MYSQLDATABASE') ?? env('MYSQL_DATABASE')) {
+            $dbname = $railwayDb;
+        }
     }
 
-    if (isCloudEnvironment() && $host === 'localhost' && !$databaseUrl && !env('MYSQLHOST')) {
+    if (isCloudEnvironment() && !$fromUrl && !env('MYSQLHOST') && !$proxyHost) {
         throw new RuntimeException(
-            'DATABASE_URL manquant. Fly.io : fly secrets set DATABASE_URL="mysql://root:PASS@xxx.proxy.rlwy.net:PORT/railway"'
+            'DATABASE_URL manquant. Railway → TCP Proxy activé → copiez MYSQL_PUBLIC_URL (proxy.rlwy.net + port type 18432).'
         );
     }
 

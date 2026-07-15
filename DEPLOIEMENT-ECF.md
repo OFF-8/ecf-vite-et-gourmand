@@ -10,7 +10,7 @@ Le projet inclut déjà un `Dockerfile` (PHP 8.2, Apache, MySQL, MongoDB).
 
 - Compte [Fly.io](https://fly.io)
 - [flyctl](https://fly.io/docs/hands-on/install-flyctl/) installé
-- MySQL externe (Railway avec **TCP Proxy** activé) ou autre
+- MySQL externe (Railway avec **TCP Proxy** activé — obligatoire) ou autre
 - [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) (gratuit M0) pour les stats admin
 
 ### Déployer sur Fly.io
@@ -19,8 +19,10 @@ Le projet inclut déjà un `Dockerfile` (PHP 8.2, Apache, MySQL, MongoDB).
 cd C:\Env\Worksapce\ECF
 fly auth login
 fly launch --no-deploy
-fly secrets set DATABASE_URL="mysql://root:PASS@xxx.proxy.rlwy.net:PORT/railway"
-fly secrets set DB_NAME=vite_et_gourmand
+# Railway : MySQL → Settings → Networking → Enable TCP Proxy
+# Copier MYSQL_PUBLIC_URL (ex. mysql://root:xxx@shuttle.proxy.rlwy.net:18432/railway)
+fly secrets set DATABASE_URL="mysql://root:TON_MDP@shuttle.proxy.rlwy.net:18432/railway"
+fly secrets unset DB_NAME
 fly secrets set MONGO_URI="mongodb+srv://USER:PASS@cluster.mongodb.net"
 fly secrets set SMTP_HOST=... SMTP_USER=... SMTP_PASS=...
 fly deploy
