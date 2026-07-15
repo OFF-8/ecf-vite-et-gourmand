@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "git clone --depth 1 https://github.com/PHPMailer/PHPMailer.git vendor/phpmailer/phpmailer && mkdir -p public/asset && cp -r asset/* public/asset/",
+  "buildCommand": "mkdir -p public/asset && cp -r asset/* public/asset/",
   "functions": {
     "api/**/*.php": {
       "runtime": "vercel-php@0.9.0",
