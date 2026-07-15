@@ -2,10 +2,16 @@
 
 function env(string $key, ?string $default = null): ?string
 {
-    $value = getenv($key);
+    $candidates = [
+        getenv($key),
+        $_ENV[$key] ?? null,
+        $_SERVER[$key] ?? null,
+    ];
 
-    if ($value !== false && $value !== '') {
-        return $value;
+    foreach ($candidates as $value) {
+        if ($value !== false && $value !== null && $value !== '') {
+            return (string) $value;
+        }
     }
 
     return $default;
