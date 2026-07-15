@@ -1,5 +1,6 @@
 <?php
 require_once 'config/database.php';
+require_once 'config/mail.php';
 
 // Visiteur non connecté → connexion ou inscription
 if (!isset($_SESSION['id_utilisateur'])) {
@@ -142,8 +143,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->commit();
             require_once 'includes/enregistrer-stat-commande.php';
             enregistrerStatCommande($idCommande, $idMenuPost, $menu['titre'], $prixTotal);
+
+            $sujet = 'Confirmation de commande n°' . $idCommande . ' — Vite & Gourmand';
+            $corps = "Bonjour {$utilisateur['prenom']},\n\n"
+                . "Votre commande n°$idCommande a bien été enregistrée.\n\n"
+                . "Menu : {$menu['titre']}\n"
+                . "Nombre de personnes : $nbPersonnes\n"
+                . "Date de prestation : " . date('d/m/Y', strtotime($datePrestation)) . " à $heureLivraison\n"
+                . "Adresse : $adresseLivraison, $ville\n"
+                . 'Total : ' . number_format($prixTotal, 2, ',', ' ') . " €\n\n"
+                . 'Suivez votre commande : ' . getBaseUrl() . "commande-detail.php?id=$idCommande\n\n"
+                . "Merci de votre confiance,\nVite & Gourmand";
+            envoyerMail($utilisateur['email'], $sujet, $corps);
+
             $succes = true;
-            // TODO : mail de confirmation
         } catch (Exception $e) {
             $pdo->rollBack();
             $erreurs[] = 'Erreur lors de la commande. Veuillez réessayer.';
@@ -161,7 +174,7 @@ require 'includes/header.php';
     <div class="alert alert-success" role="alert">
         Votre commande a bien été enregistrée. Un email de confirmation vous sera envoyé.
     </div>
-    <a class="btn btn-primary" href="menus.php">Retour aux menus</a>
+    <a class="btn btn-primary" href="<?= $basePath ?>menus.php">Retour aux menus</a>
 <?php else: ?>
 
 <?php foreach ($erreurs as $erreur): ?>
@@ -261,7 +274,7 @@ require 'includes/header.php';
     <button class="btn btn-primary btn-lg" type="submit">Valider la commande</button>
 </form>
 
-<script src="asset/commande.js"></script>
+<script src="<?= $basePath ?>asset/commande.js"></script>
 <?php endif; ?>
 
 <?php require 'includes/footer.php'; ?>

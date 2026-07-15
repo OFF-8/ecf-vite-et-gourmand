@@ -1,5 +1,6 @@
 <?php
 require_once 'config/database.php';
+require_once 'config/mail.php';
 
 $erreurs = [];
 $succes = false;
@@ -20,9 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $destinataire = 'contact@vite-et-gourmand.fr';
         $sujet = 'Contact site : ' . $titre;
         $message = "Email client : $email\n\n$description";
-        $headers = "From: $email\r\nReply-To: $email\r\nContent-Type: text/plain; charset=UTF-8";
 
-        if (mail($destinataire, $sujet, $message, $headers)) {
+        if (envoyerMail($destinataire, $sujet, $message, $email)) {
             $succes = true;
         } else {
             $erreurs[] = 'Erreur lors de l\'envoi. Réessayez plus tard.';

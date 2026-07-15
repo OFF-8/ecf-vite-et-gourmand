@@ -3,3 +3,8 @@ hash.php
 *.log
 .DS_Store
 Thumbs.db
+config/mail.local.php
+config/local.php
+.env
+/vendor/
+.vercel

@@ -7,7 +7,7 @@ function enregistrerStatCommande(int $idCommande, int $idMenu, string $menuTitre
     }
 
     require_once __DIR__ . '/../config/mongodb.php';
-    global $mongoManager, $mongoDatabase, $mongoCollection;
+    
 
     if (!$mongoManager) {
         return;

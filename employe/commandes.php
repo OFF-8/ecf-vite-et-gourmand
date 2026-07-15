@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/mail.php';
 require_once __DIR__ . '/../includes/auth-role.php';
 requireRole(['employe', 'administrateur']);
 
@@ -37,8 +38,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'statu
             'id_statut' => $idStatut,
             'id_utilisateur' => $_SESSION['id_utilisateur'],
         ]);
+
+        $stmt = $pdo->prepare(
+            'SELECT c.id_commande, u.prenom, u.email, m.titre
+             FROM commande c
+             JOIN utilisateur u ON u.id_utilisateur = c.id_utilisateur
+             JOIN menu m ON m.id_menu = c.id_menu
+             WHERE c.id_commande = :id'
+        );
+        $stmt->execute(['id' => $idCommande]);
+        $commandeMail = $stmt->fetch();
+
+        if ($commandeMail) {
+            if ($idStatut === 6) {
+                $sujet = 'Retour de matériel — commande n°' . $idCommande;
+                $corps = "Bonjour {$commandeMail['prenom']},\n\n"
+                    . "Votre commande n°{$idCommande} ({$commandeMail['titre']}) est en attente du retour du matériel prêté.\n\n"
+                    . "Merci de nous contacter pour organiser la récupération.\n\nVite & Gourmand";
+                envoyerMail($commandeMail['email'], $sujet, $corps);
+            } elseif ($idStatut === 7) {
+                $lienAvis = getBaseUrl() . 'commande-detail.php?id=' . $idCommande;
+                $sujet = 'Votre commande est terminée — laissez un avis';
+                $corps = "Bonjour {$commandeMail['prenom']},\n\n"
+                    . "Votre commande n°{$idCommande} ({$commandeMail['titre']}) est terminée.\n\n"
+                    . "Nous serions ravis de connaître votre avis :\n$lienAvis\n\nMerci,\nVite & Gourmand";
+                envoyerMail($commandeMail['email'], $sujet, $corps);
+            }
+        }
+
         $succes = 'Statut mis à jour.';
-        // TODO : envoi mail si statut 6 (retour matériel) ou 7 (terminée → invitation avis)
     }
 }
 

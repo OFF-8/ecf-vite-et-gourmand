@@ -46,5 +46,5 @@ require 'includes/header.php';
 
 <div id="liste-menus" class="row g-4" aria-live="polite"></div>
 
-<script src="asset/menus.js"></script>
+<script src="<?= $basePath ?>asset/menus.js"></script>
 <?php require 'includes/footer.php'; ?>

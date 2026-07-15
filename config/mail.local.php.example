@@ -1,0 +1,13 @@
+<?php
+
+// Copier ce fichier en config/mail.local.php et renseigner vos identifiants SMTP.
+// En dev : Mailtrap (https://mailtrap.io) — en prod : SMTP de l'hébergeur.
+
+$mailConfig = [
+    'smtp_host' => 'sandbox.smtp.mailtrap.io',
+    'smtp_port' => 587,
+    'smtp_user' => 'votre_utilisateur_mailtrap',
+    'smtp_pass' => 'votre_mot_de_passe_mailtrap',
+    'from_email' => 'contact@vite-et-gourmand.fr',
+    'from_name' => 'Vite & Gourmand',
+];

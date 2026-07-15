@@ -1,0 +1,43 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: vite_et_gourmand
+      DB_USER: vg_user
+      DB_PASSWORD: vg_pass
+      MONGO_URI: mongodb://mongo:27017
+      MONGO_DATABASE: vite_et_gourmand
+      MONGO_COLLECTION: commandes_stats
+    depends_on:
+      db:
+        condition: service_healthy
+      mongo:
+        condition: service_started
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: vite_et_gourmand
+      MYSQL_USER: vg_user
+      MYSQL_PASSWORD: vg_pass
+    volumes:
+      - ./sql/creation_bdd.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./sql/fixtures.sql:/docker-entrypoint-initdb.d/02-fixtures.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:

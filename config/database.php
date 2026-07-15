@@ -1,13 +1,18 @@
 <?php
+require_once __DIR__ . '/env.php';
+require_once __DIR__ . '/app.php';
+
 session_start();
-$host = 'localhost';
-$dbname = 'vite_et_gourmand';
-$user = 'root';
-$password = '';   // vide par défaut sur XAMPP
+
+$host = env('DB_HOST', 'localhost');
+$port = env('DB_PORT', '3306');
+$dbname = env('DB_NAME', 'vite_et_gourmand');
+$user = env('DB_USER', 'root');
+$password = env('DB_PASSWORD', '');
 
 try {
     $pdo = new PDO(
-        "mysql:host=$host;dbname=$dbname;charset=utf8mb4",
+        "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4",
         $user,
         $password,
         [

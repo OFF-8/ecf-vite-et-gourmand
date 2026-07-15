@@ -1,0 +1,13 @@
+{
+    "name": "off-8/ecf-vite-et-gourmand",
+    "description": "Application web Vite & Gourmand — ECF DWWM",
+    "require": {
+        "php": ">=8.0",
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "scripts": {
+        "vercel": [
+            "@php -v"
+        ]
+    }
+}

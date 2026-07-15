@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/mail.php';
 require_once __DIR__ . '/../includes/auth-role.php';
 requireRole(['administrateur']);
 
@@ -40,8 +41,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'creer
                 'email' => $email, 'adresse' => $adresse,
                 'mdp' => password_hash($mdp, PASSWORD_DEFAULT),
             ]);
-            $succes = 'Compte employé créé. Un email de notification sera envoyé (sans le mot de passe).';
-            // TODO : envoi mail de notification
+
+            $sujet = 'Votre compte employé Vite & Gourmand';
+            $corps = "Bonjour $prenom,\n\n"
+                . "Un compte employé a été créé pour vous sur l'application Vite & Gourmand.\n\n"
+                . "Identifiant : $email\n"
+                . 'Connexion : ' . getBaseUrl() . "connexion.php\n\n"
+                . "Votre mot de passe vous a été communiqué séparément par l'administrateur.\n\n"
+                . "Vite & Gourmand";
+            envoyerMail($email, $sujet, $corps);
+
+            $succes = 'Compte employé créé. Un email de notification a été envoyé (sans le mot de passe).';
         }
     }
 }

@@ -1,5 +1,6 @@
 <?php
 require_once 'config/database.php';
+require_once 'config/mail.php';
 
 $erreurs = [];
 
@@ -42,7 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'email' => $email, 'adresse' => $adresse,
             'mdp' => password_hash($mdp, PASSWORD_DEFAULT),
         ]);
-        // TODO : envoi du mail de bienvenue (sera branché avec PHPMailer)
+
+        $sujet = 'Bienvenue chez Vite & Gourmand';
+        $corps = "Bonjour $prenom,\n\nVotre compte a bien été créé. Vous pouvez dès maintenant commander nos menus traiteur.\n\n"
+            . 'Connectez-vous ici : ' . getBaseUrl() . "connexion.php\n\nÀ bientôt,\nVite & Gourmand";
+        envoyerMail($email, $sujet, $corps);
+
         header('Location: connexion.php?inscription=ok');
         exit;
     }

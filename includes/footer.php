@@ -13,8 +13,8 @@
             ?>
         </ul>
         <p class="mb-0">
-            <a class="link-light" href="mentions-legales.php">Mentions légales</a> ·
-            <a class="link-light" href="cgv.php">Conditions générales de vente</a>
+            <a class="link-light" href="<?= $basePath ?>mentions-legales.php">Mentions légales</a> ·
+            <a class="link-light" href="<?= $basePath ?>cgv.php">Conditions générales de vente</a>
         </p>
     </div>
 </footer>

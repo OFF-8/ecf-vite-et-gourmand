@@ -1,5 +1,6 @@
 <?php
 require_once 'config/database.php';
+require_once 'config/mail.php';
 
 $message = '';
 
@@ -34,12 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'id' => $utilisateur['id_utilisateur'],
             ]);
 
-            $lien = 'http://localhost/ecf/reinitialiser-mot-de-passe.php?token=' . $token;
+            $lien = getBaseUrl() . 'reinitialiser-mot-de-passe.php?token=' . $token;
             $sujet = 'Réinitialisation de votre mot de passe — Vite & Gourmand';
             $corps = "Bonjour,\n\nPour réinitialiser votre mot de passe, cliquez sur le lien suivant :\n$lien\n\nCe lien expire dans 1 heure.\n\nSi vous n'êtes pas à l'origine de cette demande, ignorez ce message.\n\nVite & Gourmand";
-            $headers = "From: contact@vite-et-gourmand.fr\r\nContent-Type: text/plain; charset=UTF-8";
 
-            mail($email, $sujet, $corps, $headers);
+            envoyerMail($email, $sujet, $corps);
         }
     }
 }

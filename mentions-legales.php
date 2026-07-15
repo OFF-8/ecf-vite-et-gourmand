@@ -9,22 +9,22 @@ require 'includes/header.php';
 <h2 class="h5">Éditeur du site</h2>
 <p>
     <strong>Vite &amp; Gourmand</strong><br>
-    Société de traiteur — forme juridique : [SARL / EURL / etc.]<br>
-    Capital social : [montant] €<br>
+    Société de traiteur — forme juridique : SARL<br>
+    Capital social : 5000 €<br>
     Siège social : 12 rue des Traiteurs, 33000 Bordeaux<br>
-    SIRET : [numéro SIRET]<br>
-    RCS Bordeaux : [numéro RCS]<br>
-    Numéro TVA intracommunautaire : [numéro TVA]<br>
+    SIRET : 800421619000015<br>
+    RCS Bordeaux : 800421619<br>
+    Numéro TVA intracommunautaire : FR 80 0421 61900<br>
     Directeurs de la publication : José Dupont et Julie Martin<br>
     Email : contact@vite-et-gourmand.fr<br>
-    Téléphone : 05 XX XX XX XX
+    Téléphone : 05 56 56 56 56
 </p>
 
 <h2 class="h5">Hébergement</h2>
 <p>
-    Hébergeur : [nom de l'hébergeur — ex. OVH, Azure, fly.io]<br>
-    Adresse : [adresse de l'hébergeur]<br>
-    Site web : [URL de l'hébergeur]
+    Hébergeur : [fly.io]<br>
+    Adresse : 10 rue de la Paix, 75000 Paris<br>
+    Site web : https://fly.io
 </p>
 
 <h2 class="h5">Propriété intellectuelle</h2>

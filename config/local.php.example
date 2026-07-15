@@ -1,0 +1,21 @@
+<?php
+
+// Copier en config/local.php pour la prod (ou utiliser les variables d'environnement Render/Docker).
+// Ce fichier est ignoré par git.
+
+putenv('DB_HOST=localhost');
+putenv('DB_PORT=3306');
+putenv('DB_NAME=vite_et_gourmand');
+putenv('DB_USER=root');
+putenv('DB_PASSWORD=');
+
+putenv('MONGO_URI=mongodb://localhost:27017');
+putenv('MONGO_DATABASE=vite_et_gourmand');
+putenv('MONGO_COLLECTION=commandes_stats');
+
+putenv('SMTP_HOST=');
+putenv('SMTP_PORT=587');
+putenv('SMTP_USER=');
+putenv('SMTP_PASS=');
+putenv('MAIL_FROM=contact@vite-et-gourmand.fr');
+putenv('MAIL_FROM_NAME=Vite & Gourmand');

@@ -1,0 +1,39 @@
+# Blueprint Render — déployer via Dashboard > New > Blueprint
+# MySQL : utiliser un service externe (Railway, Aiven…) et renseigner les variables DB_*
+# MongoDB : MongoDB Atlas (gratuit M0)
+
+services:
+  - type: web
+    name: vite-et-gourmand
+    runtime: docker
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: MONGO_URI
+        sync: false
+      - key: MONGO_DATABASE
+        value: vite_et_gourmand
+      - key: MONGO_COLLECTION
+        value: commandes_stats
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: MAIL_FROM
+        value: contact@vite-et-gourmand.fr
+      - key: MAIL_FROM_NAME
+        value: Vite & Gourmand

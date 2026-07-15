@@ -1,0 +1,7 @@
+{
+  "name": "ecf-vite-et-gourmand",
+  "private": true,
+  "scripts": {
+    "vercel-build": "mkdir -p public/asset && cp -r asset/* public/asset/"
+  }
+}

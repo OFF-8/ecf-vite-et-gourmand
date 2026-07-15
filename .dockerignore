@@ -1,0 +1,11 @@
+.git
+.gitignore
+vendor/
+config/mail.local.php
+config/local.php
+*.md
+.env
+.env.*
+docker-compose.yml
+Dockerfile
+.dockerignore
