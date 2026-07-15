@@ -18,6 +18,11 @@ if ($path === '' || $path === 'index.php') {
     return;
 }
 
+if ($path === 'install.php') {
+    require __DIR__ . '/install.php';
+    return;
+}
+
 $target = __DIR__ . '/../' . $path;
 
 if (is_dir($target)) {
