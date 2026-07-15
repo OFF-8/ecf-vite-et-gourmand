@@ -7,5 +7,4 @@ config/local.php
 docker-compose.yml
 Dockerfile
 .dockerignore
-sql/
 render.yaml

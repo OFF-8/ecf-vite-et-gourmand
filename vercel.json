@@ -9,6 +9,7 @@
   },
   "routes": [
     { "handle": "filesystem" },
+    { "src": "/install.php", "dest": "/api/install.php" },
     { "src": "/(.*)", "dest": "/api/index.php" }
   ]
 }
