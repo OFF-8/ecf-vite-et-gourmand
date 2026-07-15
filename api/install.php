@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Installation BDD — point d'entrée Vercel (api/install.php).
+ * Installation BDD — point d'entrée Vercel / Fly.io (api/install.php).
  */
 define('APP_ROOT', dirname(__DIR__));
 
@@ -27,21 +27,13 @@ try {
 }
 
 $options = getDatabasePdoOptions();
-$options[PDO::ATTR_TIMEOUT] = 15;
+$options[PDO::ATTR_TIMEOUT] = 30;
 
-function installConnect(?array $params, ?string $dbname, array $options): PDO
+function installConnect(array $params, array $options): PDO
 {
-    $host = $params['host'];
-    $port = $params['port'];
-    $user = $params['user'];
-    $password = $params['password'];
+    $dsn = "mysql:host={$params['host']};port={$params['port']};dbname={$params['dbname']};charset=utf8mb4;allowPublicKeyRetrieval=true";
 
-    $dsn = "mysql:host=$host;port=$port;charset=utf8mb4;allowPublicKeyRetrieval=true";
-    if ($dbname) {
-        $dsn .= ";dbname=$dbname";
-    }
-
-    return new PDO($dsn, $user, $password, $options);
+    return new PDO($dsn, $params['user'], $params['password'], $options);
 }
 
 function installIsDone(PDO $pdo): bool
@@ -49,7 +41,7 @@ function installIsDone(PDO $pdo): bool
     return (bool) $pdo->query("SHOW TABLES LIKE 'role'")->fetch();
 }
 
-function installRunSql(PDO $pdo, string $path): void
+function installRunSql(array $params, array $options, string $path): void
 {
     $sql = file_get_contents($path);
     if ($sql === false) {
@@ -57,10 +49,27 @@ function installRunSql(PDO $pdo, string $path): void
     }
 
     $sql = preg_replace('/^--.*$/m', '', $sql);
+    $pdo = installConnect($params, $options);
+
     foreach (preg_split('/;\s*[\r\n]+/', $sql) as $statement) {
         $statement = trim($statement);
-        if ($statement !== '') {
+        if ($statement === '') {
+            continue;
+        }
+
+        if (isCloudEnvironment() && preg_match('/^(CREATE DATABASE|USE)\s/i', $statement)) {
+            continue;
+        }
+
+        try {
             $pdo->exec($statement);
+        } catch (PDOException $e) {
+            if (str_contains($e->getMessage(), 'gone away')) {
+                $pdo = installConnect($params, $options);
+                $pdo->exec($statement);
+            } else {
+                throw $e;
+            }
         }
     }
 }
@@ -69,26 +78,24 @@ $messages = [];
 $erreur = $erreur ?? '';
 
 if ($params) {
-try {
     try {
-        $pdo = installConnect($params, $params['dbname'], $options);
-        if (installIsDone($pdo)) {
-            $messages[] = "La base <strong>{$params['dbname']}</strong> est déjà installée.";
-        } else {
-            throw new PDOException('Base vide');
+        try {
+            $pdo = installConnect($params, $options);
+            if (installIsDone($pdo)) {
+                $messages[] = "La base <strong>{$params['dbname']}</strong> est déjà installée.";
+            } else {
+                throw new PDOException('Base vide');
+            }
+        } catch (PDOException) {
+            installRunSql($params, $options, APP_ROOT . '/sql/creation_bdd.sql');
+            $messages[] = 'Schéma créé dans la base <strong>' . htmlspecialchars($params['dbname']) . '</strong>.';
+            installRunSql($params, $options, APP_ROOT . '/sql/fixtures.sql');
+            $messages[] = 'Données importées.';
+            $messages[] = 'Installation terminée.';
         }
-    } catch (PDOException) {
-        $pdo = installConnect($params, null, $options);
-        installRunSql($pdo, APP_ROOT . '/sql/creation_bdd.sql');
-        $messages[] = 'Schéma créé.';
-        $pdo = installConnect($params, $params['dbname'], $options);
-        installRunSql($pdo, APP_ROOT . '/sql/fixtures.sql');
-        $messages[] = 'Données importées.';
-        $messages[] = 'Installation terminée.';
+    } catch (Throwable $e) {
+        $erreur = $e->getMessage();
     }
-} catch (Throwable $e) {
-    $erreur = $e->getMessage();
-}
 }
 
 $baseUrl = getBasePath();
@@ -105,10 +112,11 @@ $baseUrl = getBasePath();
 
     <?php if ($erreur): ?>
         <div class="alert alert-danger"><?= htmlspecialchars($erreur) ?></div>
+        <p>Railway utilise la base <code>railway</code> (pas <code>vite_et_gourmand</code>).</p>
         <p><strong>Fly.io :</strong></p>
         <pre>fly secrets set DATABASE_URL="mysql://root:PASS@xxx.proxy.rlwy.net:PORT/railway"
-fly secrets set DB_NAME=vite_et_gourmand</pre>
-        <p><strong>Vercel :</strong> DATABASE_URL + DB_NAME=vite_et_gourmand + DB_SSL=0</p>
+fly secrets unset DB_NAME
+fly deploy</pre>
     <?php else: ?>
         <?php foreach ($messages as $message): ?>
             <div class="alert alert-success"><?= $message ?></div>

@@ -27,6 +27,10 @@ function getDatabaseParams(): array
             $port = (string) ($parts['port'] ?? $port);
             $user = isset($parts['user']) ? rawurldecode($parts['user']) : $user;
             $password = isset($parts['pass']) ? rawurldecode($parts['pass']) : $password;
+            $urlDb = ltrim($parts['path'] ?? '', '/');
+            if ($urlDb !== '') {
+                $dbname = $urlDb;
+            }
         }
     }
 

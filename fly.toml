@@ -8,7 +8,6 @@ primary_region = 'cdg'
   dockerfile = 'Dockerfile'
 
 [env]
-  DB_NAME = 'vite_et_gourmand'
   DB_SSL = '0'
   MONGO_DATABASE = 'vite_et_gourmand'
   MONGO_COLLECTION = 'commandes_stats'
