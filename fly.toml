@@ -1,0 +1,27 @@
+# fly.toml — déploiement ECF sur Fly.io
+# Docs : https://fly.io/docs/languages-and-frameworks/php/
+
+app = 'ecf-vite-gourmand'
+primary_region = 'cdg'
+
+[build]
+  dockerfile = 'Dockerfile'
+
+[env]
+  DB_NAME = 'vite_et_gourmand'
+  DB_SSL = '0'
+  MONGO_DATABASE = 'vite_et_gourmand'
+  MONGO_COLLECTION = 'commandes_stats'
+
+[http_service]
+  internal_port = 80
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '512mb'
+  cpu_kind = 'shared'
+  cpus = 1
