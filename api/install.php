@@ -49,7 +49,6 @@ function installRunSql(array $params, array $options, string $path): void
     }
 
     $sql = preg_replace('/^--.*$/m', '', $sql);
-    $pdo = installConnect($params, $options);
 
     foreach (preg_split('/;\s*[\r\n]+/', $sql) as $statement) {
         $statement = trim($statement);
@@ -61,15 +60,24 @@ function installRunSql(array $params, array $options, string $path): void
             continue;
         }
 
-        try {
-            $pdo->exec($statement);
-        } catch (PDOException $e) {
-            if (str_contains($e->getMessage(), 'gone away')) {
+        $lastError = null;
+        for ($attempt = 0; $attempt < 3; $attempt++) {
+            try {
                 $pdo = installConnect($params, $options);
                 $pdo->exec($statement);
-            } else {
-                throw $e;
+                $lastError = null;
+                break;
+            } catch (PDOException $e) {
+                $lastError = $e;
+                if (!str_contains($e->getMessage(), 'gone away')
+                    && !str_contains($e->getMessage(), 'Lost connection')) {
+                    throw $e;
+                }
             }
+        }
+
+        if ($lastError !== null) {
+            throw $lastError;
         }
     }
 }
@@ -143,22 +151,17 @@ $baseUrl = getBasePath();
             <p><strong>Problème :</strong> l'app se connecte à <code>127.0.0.1</code> (local). Le secret <code>DATABASE_URL</code> n'est pas lu par Fly.</p>
         <?php elseif (!($diag['tcp_proxy'] ?? false)): ?>
             <p><strong>Problème :</strong> l'hôte n'est pas <code>*.proxy.rlwy.net</code>. Activez le <strong>TCP Proxy</strong> sur Railway (Settings → Networking).</p>
+        <?php elseif (($diag['dbname'] ?? '') === 'vite_et_gourmand'): ?>
+            <p><strong>Problème :</strong> base <code>vite_et_gourmand</code> inexistante sur Railway. Utilisez <code>/railway</code> dans <code>DATABASE_URL</code> et supprimez <code>DB_NAME</code>.</p>
         <?php elseif (($diag['port'] ?? '') === '3306'): ?>
             <p><strong>Problème probable :</strong> port <code>3306</code>. Avec TCP Proxy, Railway utilise un port dédié (ex. <code>18432</code>), pas 3306.</p>
         <?php endif; ?>
 
-        <h2>Railway — activer TCP Proxy</h2>
-        <ol>
-            <li>Service <strong>MySQL</strong> → <strong>Settings</strong> → <strong>Networking</strong></li>
-            <li><strong>Enable TCP Proxy</strong></li>
-            <li>Variables → copiez <code>MYSQL_PUBLIC_URL</code> (format <code>mysql://root:...@shuttle.proxy.rlwy.net:18432/railway</code>)</li>
-        </ol>
-
-        <h2>Fly.io</h2>
-        <pre>fly secrets set DATABASE_URL="mysql://root:TON_MDP@shuttle.proxy.rlwy.net:18432/railway"
-fly secrets unset DB_NAME
-fly deploy</pre>
-        <p>Remplace <code>TON_MDP</code>, le domaine et le <strong>port exact</strong> par ceux de Railway.</p>
+        <h2>Vercel / Fly.io</h2>
+        <pre>DATABASE_URL=mysql://root:TON_MDP@shuttle.proxy.rlwy.net:18432/railway
+DB_SSL=0
+(supprimez DB_NAME si présent)</pre>
+        <p>La fin de l'URL doit être <code>/railway</code> — pas <code>/vite_et_gourmand</code>.</p>
     <?php else: ?>
         <?php foreach ($messages as $message): ?>
             <div class="alert alert-success"><?= $message ?></div>

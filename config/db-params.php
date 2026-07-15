@@ -76,6 +76,11 @@ function getDatabaseParams(): array
         $host = '127.0.0.1';
     }
 
+    // Railway : une seule base "railway" — vite_et_gourmand n'existe pas en cloud
+    if (isCloudEnvironment() && str_contains($host, 'proxy.rlwy.net') && $dbname === 'vite_et_gourmand') {
+        $dbname = 'railway';
+    }
+
     return compact('host', 'port', 'dbname', 'user', 'password');
 }
 
