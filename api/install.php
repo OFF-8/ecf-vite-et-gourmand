@@ -41,8 +41,9 @@ $options = [
     PDO::ATTR_TIMEOUT => 10,
 ];
 
+$useSsl = env('DB_SSL', '0');
 $isLocal = in_array($host, ['localhost', '127.0.0.1', 'db'], true);
-if (!$isLocal || env('VERCEL') === '1') {
+if ($useSsl === '1') {
     if (PHP_VERSION_ID >= 80400) {
         $options[\Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT] = false;
     } elseif (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
@@ -52,7 +53,7 @@ if (!$isLocal || env('VERCEL') === '1') {
 
 function installConnect(string $host, string $port, string $user, string $password, ?string $dbname, array $options): PDO
 {
-    $dsn = "mysql:host=$host;port=$port;charset=utf8mb4";
+    $dsn = "mysql:host=$host;port=$port;charset=utf8mb4;allowPublicKeyRetrieval=true";
     if ($dbname) {
         $dsn .= ";dbname=$dbname";
     }
@@ -119,7 +120,8 @@ $baseUrl = getBasePath();
 
     <?php if ($erreur): ?>
         <div class="alert alert-danger"><?= htmlspecialchars($erreur) ?></div>
-        <p>Vérifiez sur Vercel : <code>DATABASE_URL</code> = URL_PUBLIC_MYSQL Railway, <code>DB_NAME=vite_et_gourmand</code>, <code>DB_SSL=1</code></p>
+        <p>Sur Railway : activez <strong>TCP Proxy</strong> et utilisez l'URL avec <code>proxy.rlwy.net</code> et un port type <code>12345</code> (pas forcément 3306).</p>
+        <p>Sur Vercel : <code>DATABASE_URL</code> = URL publique Railway, <code>DB_NAME=vite_et_gourmand</code>, <code>DB_SSL=0</code></p>
     <?php else: ?>
         <?php foreach ($messages as $message): ?>
             <div class="alert alert-success"><?= $message ?></div>

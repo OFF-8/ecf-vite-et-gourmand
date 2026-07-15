@@ -31,7 +31,7 @@ $options = [
 $useSsl = env('DB_SSL', 'auto');
 $isLocal = in_array($host, ['localhost', '127.0.0.1', 'db'], true);
 
-if ($useSsl !== '0' && ($useSsl === '1' || ($useSsl === 'auto' && !$isLocal))) {
+if ($useSsl !== '0' && ($useSsl === '1' || ($useSsl === 'auto' && !$isLocal && env('VERCEL') !== '1'))) {
     if (PHP_VERSION_ID >= 80400) {
         $options[\Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT] = false;
     } elseif (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
@@ -39,9 +39,14 @@ if ($useSsl !== '0' && ($useSsl === '1' || ($useSsl === 'auto' && !$isLocal))) {
     }
 }
 
+$dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
+if (!$isLocal) {
+    $dsn .= ';allowPublicKeyRetrieval=true';
+}
+
 try {
     $pdo = new PDO(
-        "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4",
+        $dsn,
         $user,
         $password,
         $options
@@ -49,6 +54,9 @@ try {
 } catch (PDOException $e) {
     if (env('VERCEL') === '1' && ($host === 'localhost' || !env('DB_HOST') && !$databaseUrl)) {
         die('Erreur de connexion : ajoutez DATABASE_URL ou DB_HOST sur Vercel (Settings → Environment Variables).');
+    }
+    if (str_contains($e->getMessage(), 'timed out')) {
+        die('Erreur de connexion : timeout MySQL. Sur Railway, activez TCP Proxy et utilisez l\'URL publique (proxy.rlwy.net + port).');
     }
     die('Erreur de connexion à la base de données.');
 }
