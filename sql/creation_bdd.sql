@@ -148,3 +148,11 @@ CREATE TABLE horaire (
     heure_ouverture TIME NOT NULL,
     heure_fermeture TIME NOT NULL
 ) ENGINE=InnoDB;
+
+-- Sessions PHP (nécessaires sur hébergement serverless type Vercel)
+CREATE TABLE IF NOT EXISTS php_session (
+    id VARCHAR(128) NOT NULL PRIMARY KEY,
+    data MEDIUMTEXT NOT NULL,
+    last_activity INT UNSIGNED NOT NULL,
+    INDEX idx_session_activity (last_activity)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
