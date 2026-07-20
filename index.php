@@ -26,6 +26,7 @@ $avis = $pdo->query(
 
 require 'includes/header.php';
 $basePath = getBasePath();
+require_once __DIR__ . '/includes/menu-image.php';
 ?>
 
 <section class="hero-home" aria-labelledby="hero-titre">
@@ -106,12 +107,12 @@ $basePath = getBasePath();
         <?php foreach ($menus as $menu): ?>
         <div class="col-md-4">
             <article class="card menu-card-home h-100">
-                <?php if ($menu['url_image'] && file_exists(__DIR__ . '/' . $menu['url_image'])): ?>
-                    <img class="card-img-top" src="<?= htmlspecialchars($basePath . $menu['url_image']) ?>"
-                         alt="<?= htmlspecialchars($menu['alt_text'] ?? $menu['titre']) ?>">
-                <?php else: ?>
-                    <div class="card-img-placeholder" aria-hidden="true">🥂</div>
-                <?php endif; ?>
+                <?php
+                $imgSrc = menuImageUrl($menu['url_image'] ?? null, $basePath);
+                $imgAlt = $menu['alt_text'] ?? $menu['titre'];
+                ?>
+                    <img class="card-img-top" src="<?= htmlspecialchars($imgSrc) ?>"
+                         alt="<?= htmlspecialchars($imgAlt) ?>" loading="lazy">
                 <div class="card-body d-flex flex-column">
                     <span class="badge text-bg-secondary mb-2 align-self-start"><?= htmlspecialchars($menu['nom_theme']) ?></span>
                     <h3 class="h5 card-title"><?= htmlspecialchars($menu['titre']) ?></h3>

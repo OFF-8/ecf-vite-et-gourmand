@@ -45,6 +45,22 @@ $plats = $stmt->fetchAll();
 
 $titrePage = $menu['titre'] . ' — Vite & Gourmand';
 require 'includes/header.php';
+require_once __DIR__ . '/includes/menu-image.php';
+
+// Résoudre les chemins d'images (fallback si fichier manquant)
+$imagesResolues = [];
+foreach ($images as $img) {
+    $imagesResolues[] = [
+        'url_image' => menuImageUrl($img['url_image'] ?? null, getBasePath()),
+        'alt_text' => $img['alt_text'] ?: $menu['titre'],
+    ];
+}
+if (!$imagesResolues) {
+    $imagesResolues[] = [
+        'url_image' => menuImageUrl(null, getBasePath()),
+        'alt_text' => $menu['titre'],
+    ];
+}
 ?>
 
 <nav aria-label="Fil d'Ariane">
@@ -57,16 +73,16 @@ require 'includes/header.php';
     <span class="badge bg-success"><?= htmlspecialchars($menu['nom_regime']) ?></span>
 </p>
 
-<?php if ($images): ?>
 <div id="galerie" class="carousel slide mb-4" data-bs-ride="carousel" style="max-width: 600px;">
     <div class="carousel-inner">
-        <?php foreach ($images as $i => $img): ?>
+        <?php foreach ($imagesResolues as $i => $img): ?>
         <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
             <img src="<?= htmlspecialchars($img['url_image']) ?>"
                  alt="<?= htmlspecialchars($img['alt_text']) ?>" class="d-block w-100 rounded">
         </div>
         <?php endforeach; ?>
     </div>
+    <?php if (count($imagesResolues) > 1): ?>
     <button class="carousel-control-prev" type="button" data-bs-target="#galerie" data-bs-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Image précédente</span>
@@ -75,8 +91,8 @@ require 'includes/header.php';
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Image suivante</span>
     </button>
+    <?php endif; ?>
 </div>
-<?php endif; ?>
 
 <p><?= nl2br(htmlspecialchars($menu['description'])) ?></p>
 

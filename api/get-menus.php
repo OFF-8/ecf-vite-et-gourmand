@@ -3,7 +3,9 @@ require_once __DIR__ . '/../config/database.php';
 header('Content-Type: application/json; charset=utf-8');
 
 $sql = 'SELECT m.id_menu, m.titre, m.description, m.nb_personnes_min,
-               m.prix_min, m.stock_disponible, t.nom_theme, r.nom_regime
+               m.prix_min, m.stock_disponible, t.nom_theme, r.nom_regime,
+               (SELECT url_image FROM image WHERE id_menu = m.id_menu LIMIT 1) AS url_image,
+               (SELECT alt_text FROM image WHERE id_menu = m.id_menu LIMIT 1) AS alt_text
         FROM menu m
         JOIN theme t ON t.id_theme = m.id_theme
         JOIN regime r ON r.id_regime = m.id_regime
@@ -36,4 +38,15 @@ if (!empty($_GET['nb_personnes'])) {
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 
-echo json_encode($stmt->fetchAll());
+require_once __DIR__ . '/../includes/menu-image.php';
+
+$menus = $stmt->fetchAll();
+foreach ($menus as &$menu) {
+    $menu['url_image'] = menuImageUrl($menu['url_image'] ?? null);
+    if (empty($menu['alt_text'])) {
+        $menu['alt_text'] = $menu['titre'];
+    }
+}
+unset($menu);
+
+echo json_encode($menus);

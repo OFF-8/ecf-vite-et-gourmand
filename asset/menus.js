@@ -18,7 +18,13 @@ async function chargerMenus() {
         colonne.className = 'col-md-4';
 
         const carte = document.createElement('div');
-        carte.className = 'card h-100';
+        carte.className = 'card menu-card-home h-100';
+
+        const image = document.createElement('img');
+        image.className = 'card-img-top';
+        image.src = menu.url_image || 'asset/img/menu-default.jpg';
+        image.alt = menu.alt_text || menu.titre;
+        image.loading = 'lazy';
 
         const corps = document.createElement('div');
         corps.className = 'card-body d-flex flex-column';
@@ -28,11 +34,11 @@ async function chargerMenus() {
         titre.textContent = menu.titre;
 
         const description = document.createElement('p');
-        description.className = 'card-text';
+        description.className = 'card-text text-muted';
         description.textContent = menu.description;
 
         const infos = document.createElement('p');
-        infos.className = 'fw-bold';
+        infos.className = 'menu-price';
         infos.textContent = `À partir de ${menu.nb_personnes_min} personnes — ${menu.prix_min} €`;
 
         const lien = document.createElement('a');
@@ -41,14 +47,11 @@ async function chargerMenus() {
         lien.textContent = 'Voir le détail';
 
         corps.append(titre, description, infos, lien);
-        carte.append(corps);
+        carte.append(image, corps);
         colonne.append(carte);
         listeMenus.append(colonne);
     }
 }
 
-// Rechargement dynamique à chaque modification d'un filtre, sans rechargement de page
 formFiltres.addEventListener('input', chargerMenus);
-
-// Premier affichage au chargement de la page
 chargerMenus();
