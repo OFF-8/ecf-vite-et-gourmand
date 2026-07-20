@@ -166,6 +166,14 @@ DB_SSL=0
         <?php foreach ($messages as $message): ?>
             <div class="alert alert-success"><?= $message ?></div>
         <?php endforeach; ?>
+        <div class="alert alert-info">
+            <strong>Diagnostic MongoDB</strong>
+            <ul class="mb-0">
+                <li>extension mongodb : <?= extension_loaded('mongodb') ? 'oui' : '<strong>non</strong>' ?></li>
+                <li>classe Manager : <?= class_exists('MongoDB\\Driver\\Manager') ? 'oui' : '<strong>non</strong>' ?></li>
+                <li>MONGO_URI défini : <?= env('MONGO_URI') ? 'oui' : '<strong>non</strong>' ?></li>
+            </ul>
+        </div>
         <a class="btn btn-primary" href="<?= htmlspecialchars($baseUrl) ?>index.php">Aller à l'accueil</a>
     <?php endif; ?>
 </body>
