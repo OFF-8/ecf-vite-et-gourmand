@@ -9,7 +9,7 @@ Application web de commande en ligne pour le traiteur bordelais **Vite & Gourman
 | **Application déployée** | https://ecf-vite-et-gourmand-self.vercel.app |
 | **Dépôt GitHub** | https://github.com/OFF-8/ecf-vite-et-gourmand |
 | **Documentation / PDFs** | dossier [`docs/`](docs/README.md) |
-| **Gestion de projet** | *(ajouter le lien Trello/Notion ici)* |
+| **Gestion de projet** | [Trello — Vite & Gourmand ECF](https://trello.com/invite/b/6a5e2f00640b0f31282bfed2/ATTIb8688758d04ecbbb412ef234c94f18d51CA01475/vite-gourmand-ecf) |
 
 ## Stack technique
 
