@@ -6,5 +6,10 @@ Thumbs.db
 config/mail.local.php
 config/local.php
 .env
+.env.*
 /vendor/
 .vercel
+.railway
+.railway*
+tmp-*.php
+tmp-*.txt

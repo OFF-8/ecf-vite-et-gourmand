@@ -59,6 +59,13 @@ function envoyerMail(string $destinataire, string $sujet, string $corps, ?string
         }
     }
 
+    // Sur Vercel / serverless : pas de sendmail → ne pas appeler mail() (évite warning + headers already sent)
+    if (env('VERCEL') === '1' || env('FLY_APP_NAME') !== null || env('AWS_LAMBDA_FUNCTION_NAME') !== null) {
+        error_log('Email non envoyé : configurez SMTP_HOST / SMTP_USER / SMTP_PASS (ex. Mailtrap).');
+
+        return false;
+    }
+
     $headers = 'From: ' . $mailConfig['from_name'] . ' <' . $mailConfig['from_email'] . ">\r\n";
 
     if ($replyTo) {
@@ -67,5 +74,5 @@ function envoyerMail(string $destinataire, string $sujet, string $corps, ?string
 
     $headers .= "Content-Type: text/plain; charset=UTF-8";
 
-    return mail($destinataire, $sujet, $corps, $headers);
+    return @mail($destinataire, $sujet, $corps, $headers);
 }

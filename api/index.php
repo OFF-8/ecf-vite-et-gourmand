@@ -38,5 +38,47 @@ if (is_file($target) && strtolower(pathinfo($target, PATHINFO_EXTENSION)) === 'p
     return;
 }
 
+$staticExtensions = ['css', 'js', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'ico', 'woff', 'woff2'];
+$extension = strtolower(pathinfo($target, PATHINFO_EXTENSION));
+
+if (is_file($target) && in_array($extension, $staticExtensions, true)) {
+    $mimes = [
+        'css' => 'text/css; charset=UTF-8',
+        'js' => 'application/javascript; charset=UTF-8',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'gif' => 'image/gif',
+        'webp' => 'image/webp',
+        'svg' => 'image/svg+xml',
+        'ico' => 'image/x-icon',
+        'woff' => 'font/woff',
+        'woff2' => 'font/woff2',
+    ];
+    header('Content-Type: ' . ($mimes[$extension] ?? 'application/octet-stream'));
+    readfile($target);
+    return;
+}
+
+// Vercel build : fichiers copiés dans public/asset/
+$publicTarget = __DIR__ . '/../public/' . $path;
+$publicExt = strtolower(pathinfo($publicTarget, PATHINFO_EXTENSION));
+if (is_file($publicTarget) && in_array($publicExt, $staticExtensions, true)) {
+    $mimes = [
+        'css' => 'text/css; charset=UTF-8',
+        'js' => 'application/javascript; charset=UTF-8',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'gif' => 'image/gif',
+        'webp' => 'image/webp',
+        'svg' => 'image/svg+xml',
+        'ico' => 'image/x-icon',
+    ];
+    header('Content-Type: ' . ($mimes[$publicExt] ?? 'application/octet-stream'));
+    readfile($publicTarget);
+    return;
+}
+
 http_response_code(404);
 echo 'Page non trouvée.';

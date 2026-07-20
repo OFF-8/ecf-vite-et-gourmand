@@ -1,17 +1,15 @@
 {
-  "name": "ecf-vite-et-gourmand",
+  "name": "off-8/ecf-vite-et-gourmand",
   "description": "ECF Vite & Gourmand — PHP",
   "require": {
     "php": "^8.2",
-    "ext-pdo": "*",
-    "ext-mongodb": "*",
     "phpmailer/phpmailer": "^6.9"
+  },
+  "suggest": {
+    "ext-mongodb": "Nécessaire pour les statistiques admin"
   },
   "require-dev": {},
   "scripts": {
-    "vercel": ["@php -v"],
-    "post-install-cmd": [
-      "if [ ! -d vendor/phpmailer/phpmailer ]; then git clone --depth 1 https://github.com/PHPMailer/PHPMailer.git vendor/phpmailer/phpmailer; fi"
-    ]
+    "vercel": ["@php -v"]
   }
 }

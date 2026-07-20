@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Charte graphique — Vite &amp; Gourmand</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        @page { margin: 2cm; }
+        * { box-sizing: border-box; }
+        body {
+            font-family: "Segoe UI", system-ui, sans-serif;
+            color: #2d2424;
+            line-height: 1.5;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        h1, h2, h3, .font-display {
+            font-family: "Cormorant Garamond", Georgia, serif;
+            color: #4a1f2b;
+        }
+        h1 { font-size: 2.2rem; border-bottom: 3px solid #c9a227; padding-bottom: 0.5rem; }
+        h2 { font-size: 1.4rem; margin-top: 2rem; }
+        .meta { color: #6c757d; font-size: 0.95rem; margin-bottom: 2rem; }
+        .palette { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1rem 0; }
+        .swatch {
+            width: 140px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .swatch-color { height: 70px; }
+        .swatch-info { padding: 0.5rem 0.75rem; font-size: 0.85rem; background: #fff; }
+        .swatch-info strong { display: block; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+        th, td { border: 1px solid #e8e0d8; padding: 0.5rem 0.75rem; text-align: left; }
+        th { background: #faf6f0; }
+        .btn-demo {
+            display: inline-block;
+            padding: 0.5rem 1.25rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            margin: 0.25rem 0.5rem 0.25rem 0;
+            font-size: 0.9rem;
+        }
+        .btn-primary-demo { background: #6b2c3e; color: #fff; }
+        .btn-light-demo { background: #fff; color: #4a1f2b; border: 1px solid #4a1f2b; }
+        .btn-outline-demo { background: transparent; color: #6b2c3e; border: 2px solid #6b2c3e; }
+        .hero-demo {
+            background: #4a1f2b;
+            color: #fff;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+        .hero-demo .badge { background: #c9a227; color: #4a1f2b; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600; }
+        .hero-demo h3 { font-family: "Cormorant Garamond", serif; color: #c9a227; margin: 0.5rem 0; }
+        .page-break { page-break-before: always; }
+        .note { background: #faf6f0; border-left: 4px solid #c9a227; padding: 0.75rem 1rem; margin: 1rem 0; font-size: 0.9rem; }
+        @media print {
+            body { padding: 0; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <p class="no-print note"><strong>Export PDF :</strong> Ctrl+P → « Enregistrer au format PDF » → Enregistrer.</p>
+
+    <h1>Charte graphique</h1>
+    <p class="meta"><strong>Vite &amp; Gourmand</strong> — Traiteur à Bordeaux<br>
+    Projet ECF — Site vitrine &amp; commande en ligne</p>
+
+    <h2>1. Identité</h2>
+    <p><strong>Nom :</strong> Vite &amp; Gourmand<br>
+    <strong>Activité :</strong> Traiteur événementiel (Bordeaux)<br>
+    <strong>Positionnement :</strong> Cuisine généreuse, fait maison, menus sur mesure (Noël, Pâques, événements pro)<br>
+    <strong>Ton visuel :</strong> Élégant, chaleureux, professionnel — inspiration bordeaux &amp; or.</p>
+
+    <h2>2. Palette de couleurs</h2>
+    <div class="palette">
+        <div class="swatch">
+            <div class="swatch-color" style="background:#4a1f2b"></div>
+            <div class="swatch-info"><strong>Bordeaux foncé</strong>#4A1F2B<br>Header, footer, hero, CTA</div>
+        </div>
+        <div class="swatch">
+            <div class="swatch-color" style="background:#6b2c3e"></div>
+            <div class="swatch-info"><strong>Bordeaux</strong>#6B2C3E<br>Boutons, panneaux, accents</div>
+        </div>
+        <div class="swatch">
+            <div class="swatch-color" style="background:#c9a227"></div>
+            <div class="swatch-info"><strong>Doré</strong>#C9A227<br>Badges, titres accent, bordures</div>
+        </div>
+        <div class="swatch">
+            <div class="swatch-color" style="background:#faf6f0"></div>
+            <div class="swatch-info"><strong>Crème</strong>#FAF6F0<br>Fond de page</div>
+        </div>
+        <div class="swatch">
+            <div class="swatch-color" style="background:#2d2424"></div>
+            <div class="swatch-info"><strong>Texte</strong>#2D2424<br>Corps de texte</div>
+        </div>
+        <div class="swatch">
+            <div class="swatch-color" style="background:#ffffff; border-bottom:1px solid #eee"></div>
+            <div class="swatch-info"><strong>Blanc</strong>#FFFFFF<br>Cartes, boutons hero</div>
+        </div>
+        <div class="swatch">
+            <div class="swatch-color" style="background:#6c757d"></div>
+            <div class="swatch-info"><strong>Gris texte secondaire</strong>#6C757D<br>Sous-titres, légendes</div>
+        </div>
+        <div class="swatch">
+            <div class="swatch-color" style="background:#e8e0d8"></div>
+            <div class="swatch-info"><strong>Gris bordure</strong>#E8E0D8<br>Cartes, séparateurs</div>
+        </div>
+    </div>
+
+    <h2>3. Typographie</h2>
+    <table>
+        <thead>
+            <tr><th>Usage</th><th>Police</th><th>Graisse</th><th>Taille (indicative)</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Titres principaux (H1)</td>
+                <td>Cormorant Garamond</td>
+                <td>700 Bold</td>
+                <td>44–68 px (desktop) / 36 px (mobile)</td>
+            </tr>
+            <tr>
+                <td>Sous-titres / accroches</td>
+                <td>Cormorant Garamond</td>
+                <td>600 SemiBold, italique possible</td>
+                <td>22–24 px</td>
+            </tr>
+            <tr>
+                <td>Titres de section (H2, H3)</td>
+                <td>Segoe UI / system-ui</td>
+                <td>700 Bold</td>
+                <td>24–28 px / 18–20 px</td>
+            </tr>
+            <tr>
+                <td>Corps de texte</td>
+                <td>Segoe UI / system-ui (Bootstrap)</td>
+                <td>400 Regular</td>
+                <td>16 px (1 rem)</td>
+            </tr>
+            <tr>
+                <td>Petits textes, labels</td>
+                <td>Segoe UI / system-ui</td>
+                <td>400–600</td>
+                <td>12–14 px</td>
+            </tr>
+            <tr>
+                <td>Navigation</td>
+                <td>Segoe UI / system-ui</td>
+                <td>400 Regular</td>
+                <td>16 px</td>
+            </tr>
+        </tbody>
+    </table>
+    <p><strong>Figma :</strong> importer « Cormorant Garamond » depuis Google Fonts. Corps : Inter ou Source Sans 3 si Segoe UI indisponible.</p>
+
+    <h2>4. Composants UI</h2>
+
+    <h3>Boutons</h3>
+    <span class="btn-demo btn-primary-demo">Bouton principal</span>
+    <span class="btn-demo btn-light-demo">Bouton clair</span>
+    <span class="btn-demo btn-outline-demo">Bouton contour</span>
+    <table>
+        <tr><th>Type</th><th>Fond</th><th>Texte</th><th>Rayon</th></tr>
+        <tr><td>Principal</td><td>#6B2C3E</td><td>#FFFFFF</td><td>2rem (pilule)</td></tr>
+        <tr><td>Hero primaire</td><td>#FFFFFF</td><td>#4A1F2B</td><td>2rem</td></tr>
+        <tr><td>Hero contour</td><td>transparent</td><td>#FFFFFF, bordure 2px blanc</td><td>2rem</td></tr>
+    </table>
+
+    <h3>Cartes</h3>
+    <p>Fond blanc #FFFFFF, bordure #E8E0D8, coins arrondis 12 px. Ombres légères optionnelles en mockup haute fidélité.</p>
+
+    <h3>Hero (accueil)</h3>
+    <div class="hero-demo">
+        <span class="badge">TRAITEUR À BORDEAUX DEPUIS 25 ANS</span>
+        <h3 class="font-display">Vite &amp; Gourmand</h3>
+        <p>Fond uni #4A1F2B — texte blanc, accent doré #C9A227.</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>5. Grille &amp; responsive</h2>
+    <table>
+        <tr><th>Format</th><th>Largeur frame Figma</th><th>Colonnes Bootstrap</th></tr>
+        <tr><td>Desktop (bureautique)</td><td>1440 px (ou 1280 px)</td><td>12 cols, container max ~1140 px</td></tr>
+        <tr><td>Mobile</td><td>390 px (iPhone 14) ou 375 px</td><td>1 colonne, menu hamburger</td></tr>
+    </table>
+
+    <h2>6. Maquettes attendues (ECF)</h2>
+    <p>Exporter en <strong>PDF</strong> ou <strong>PNG</strong> depuis Figma :</p>
+    <table>
+        <thead>
+            <tr><th>#</th><th>Page</th><th>Desktop</th><th>Mobile</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>Accueil</td><td>Wireframe + Mockup</td><td>Wireframe + Mockup</td></tr>
+            <tr><td>2</td><td>Liste des menus</td><td>Wireframe + Mockup</td><td>Wireframe + Mockup</td></tr>
+            <tr><td>3</td><td>Détail menu / Commande</td><td>Wireframe + Mockup</td><td>Wireframe + Mockup</td></tr>
+        </tbody>
+    </table>
+    <p><strong>Wireframe :</strong> structure en niveaux de gris, sans photos — blocs, textes factices, hiérarchie.<br>
+    <strong>Mockup :</strong> charte appliquée (couleurs, typos, boutons, visuels).</p>
+
+    <h2>7. Accessibilité (RGAA)</h2>
+    <ul>
+        <li>Contraste texte / fond respecté (bordeaux foncé + blanc, texte #2D2424 sur crème)</li>
+        <li>Textes alternatifs sur les images de menus</li>
+        <li>Navigation au clavier, labels sur les formulaires</li>
+        <li>Structure sémantique : header, main, footer, titres H1–H3</li>
+    </ul>
+
+    <h2>8. Fichiers du projet</h2>
+    <ul>
+        <li>Styles : <code>asset/index.css</code></li>
+        <li>Framework : Bootstrap 5.3</li>
+        <li>Référence locale : <code>http://localhost/ecf/</code></li>
+    </ul>
+
+    <p class="meta" style="margin-top:3rem">Document généré pour le livrable ECF — Vite &amp; Gourmand</p>
+
+</body>
+</html>

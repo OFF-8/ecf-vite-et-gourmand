@@ -4,7 +4,13 @@ config/mail.local.php
 config/local.php
 .env
 .env.*
+.railway
+.railway*
+tmp-*.php
+tmp-*.txt
 docker-compose.yml
 Dockerfile
 .dockerignore
 render.yaml
+fly.toml
+DEPLOIEMENT-ECF.md

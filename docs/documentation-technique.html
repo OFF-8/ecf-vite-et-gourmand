@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Documentation technique — Vite &amp; Gourmand</title>
+    <style>
+        @page { margin: 1.6cm; }
+        body { font-family: "Segoe UI", system-ui, sans-serif; color: #2d2424; line-height: 1.45; max-width: 860px; margin: 0 auto; padding: 1.5rem; font-size: 0.95rem; }
+        h1, h2, h3 { font-family: Georgia, serif; color: #4a1f2b; }
+        h1 { border-bottom: 3px solid #c9a227; padding-bottom: .35rem; }
+        h2 { margin-top: 1.6rem; page-break-after: avoid; }
+        table { width: 100%; border-collapse: collapse; margin: .8rem 0; font-size: .88rem; }
+        th, td { border: 1px solid #e0d6cc; padding: .4rem .55rem; text-align: left; vertical-align: top; }
+        th { background: #faf6f0; }
+        pre, .box { background: #f7f3ee; border: 1px solid #e8dfd4; padding: .75rem 1rem; overflow-x: auto; font-size: .8rem; line-height: 1.35; }
+        .note { background: #faf6f0; border-left: 4px solid #c9a227; padding: .65rem .9rem; margin: .8rem 0; }
+        .page-break { page-break-before: always; }
+        .no-print { background: #fff3cd; padding: .75rem 1rem; }
+        ul { padding-left: 1.2rem; }
+        @media print { .no-print { display: none; } body { padding: 0; } }
+    </style>
+</head>
+<body>
+<p class="no-print"><strong>Export PDF :</strong> Ctrl+P → « Enregistrer au format PDF ».</p>
+
+<h1>Documentation technique</h1>
+<p><strong>Projet :</strong> Vite &amp; Gourmand — ECF DWWM<br>
+<strong>Dépôt :</strong> https://github.com/OFF-8/ecf-vite-et-gourmand<br>
+<strong>Production :</strong> https://ecf-vite-et-gourmand-self.vercel.app</p>
+
+<h2>1. Réflexions technologiques initiales</h2>
+<table>
+    <thead><tr><th>Besoin</th><th>Choix</th><th>Justification</th><th>Alternative écartée</th></tr></thead>
+    <tbody>
+        <tr>
+            <td>Application web dynamique + formulaires</td>
+            <td><strong>PHP 8 + HTML/CSS/JS</strong></td>
+            <td>Stack imposée / maîtrisée en formation DWWM ; rendu serveur simple à déployer et à expliquer.</td>
+            <td>Node/React (surdimensionné pour le périmètre ECF).</td>
+        </tr>
+        <tr>
+            <td>UI responsive rapide</td>
+            <td><strong>Bootstrap 5</strong></td>
+            <td>Grille, composants accessibles, gain de temps sur formulaires et navigation.</td>
+            <td>CSS from scratch uniquement (trop long pour le planning).</td>
+        </tr>
+        <tr>
+            <td>Données métier relationnelles</td>
+            <td><strong>MySQL + PDO</strong></td>
+            <td>Intégrité (FK), transactions implicites via InnoDB, requêtes préparées (anti-injection).</td>
+            <td>SQLite (moins adapté multi-utilisateurs / hébergement cloud).</td>
+        </tr>
+        <tr>
+            <td>Statistiques admin</td>
+            <td><strong>MongoDB</strong> (+ Chart.js)</td>
+            <td>Exigence sujet NoSQL ; documents de stats flexibles, découplés du schéma relationnel.</td>
+            <td>Uniquement SQL aggregations (ne satisfait pas l'exigence NoSQL).</td>
+        </tr>
+        <tr>
+            <td>Emails transactionnels</td>
+            <td><strong>PHPMailer (SMTP)</strong></td>
+            <td>Fiable en prod ; fallback <code>mail()</code> en local.</td>
+            <td><code>mail()</code> seul (souvent non fonctionnel en cloud).</td>
+        </tr>
+        <tr>
+            <td>Hébergement (sujet : Vercel / Fly / Azure / Heroku)</td>
+            <td><strong>Vercel (PHP) + MySQL Railway</strong></td>
+            <td>Déploiement rapide, HTTPS, CI via Git ; MySQL externalisé car Vercel n'héberge pas MySQL.</td>
+            <td>AlwaysData (excellent PHP mais hors liste stricte du sujet déploiement cloud listé).</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="page-break"></div>
+<h2>2. Environnement de travail</h2>
+<table>
+    <thead><tr><th>Outil</th><th>Usage</th></tr></thead>
+    <tbody>
+        <tr><td>Windows 10/11</td><td>Poste de développement</td></tr>
+        <tr><td>XAMPP (Apache + MySQL + PHP 8)</td><td>Exécution locale</td></tr>
+        <tr><td>VS Code / Cursor</td><td>Édition, Git</td></tr>
+        <tr><td>phpMyAdmin / DBeaver</td><td>Inspection SQL</td></tr>
+        <tr><td>Git + GitHub</td><td>Versionning, branches feature/*</td></tr>
+        <tr><td>Figma</td><td>Maquettes (wireframes &amp; mockups)</td></tr>
+        <tr><td>Notion / Trello</td><td>Suivi de projet (kanban)</td></tr>
+        <tr><td>Vercel CLI + Railway</td><td>Déploiement et base cloud</td></tr>
+    </tbody>
+</table>
+
+<h2>3. Architecture applicative</h2>
+<pre class="box">Navigateur
+   │
+   ▼
+Vercel (runtime vercel-php) ──► api/index.php (routeur)
+   │                                │
+   │                                ├── pages PHP (public / client / employé / admin)
+   │                                ├── includes/ (auth, header, footer)
+   │                                └── config/ (env, PDO, mail, mongo)
+   │
+   ├── MySQL (Railway)     données métier
+   └── MongoDB (optionnel) stats admin
+</pre>
+
+<div class="page-break"></div>
+<h2>4. Modèle conceptuel de données (MCD simplifié)</h2>
+<pre class="box">ROLE (1,n) —— (1,1) UTILISATEUR
+UTILISATEUR (0,n) —— (1,1) COMMANDE —— (1,1) STATUT_COMMANDE
+UTILISATEUR (0,n) —— (0,1) RESET_PASSWORD_TOKEN
+MENU (1,n) —— (0,n) PLAT          via MENU_PLAT
+MENU (1,1) —— (0,n) THEME / REGIME
+MENU (1,n) —— (0,n) IMAGE
+PLAT (0,n) —— (0,n) ALLERGENE     via PLAT_ALLERGENE
+COMMANDE (1,1) —— (1,1) MENU
+COMMANDE (0,1) —— (0,1) AVIS
+HORAIRE (indépendant)
+</pre>
+<p>Schéma SQL détaillé : <code>sql/creation_bdd.sql</code>. Données de démo : <code>sql/fixtures.sql</code>.</p>
+
+<h2>5. Diagramme de cas d'utilisation (résumé)</h2>
+<table>
+    <thead><tr><th>Acteur</th><th>Cas d'utilisation principaux</th></tr></thead>
+    <tbody>
+        <tr><td>Visiteur</td><td>Consulter menus, contacter, s'inscrire</td></tr>
+        <tr><td>Client</td><td>Se connecter, commander, suivre, avis, profil, reset MDP</td></tr>
+        <tr><td>Employé</td><td>Gérer commandes/statuts, menus, plats, horaires, avis</td></tr>
+        <tr><td>Administrateur</td><td>Gérer employés, consulter statistiques</td></tr>
+    </tbody>
+</table>
+
+<h2>6. Diagramme de séquence — passer une commande</h2>
+<pre class="box">Client          Navigateur         commande.php         MySQL           Mail
+  │                 │                   │                 │              │
+  │  choisir menu   │                   │                 │              │
+  │────────────────►│  GET/POST         │                 │              │
+  │                 │──────────────────►│  vérif session  │              │
+  │                 │                   │  + stock/prix   │              │
+  │                 │                   │────────────────►│              │
+  │                 │                   │  INSERT commande│              │
+  │                 │                   │────────────────►│              │
+  │                 │                   │  email confirm. │──────────────►│
+  │                 │  redirect suivi   │                 │              │
+  │◄────────────────│◄──────────────────│                 │              │
+</pre>
+
+<div class="page-break"></div>
+<h2>7. Sécurité — dispositions prises</h2>
+<table>
+    <thead><tr><th>Risque</th><th>Mesure</th></tr></thead>
+    <tbody>
+        <tr><td>Injection SQL</td><td>Requêtes préparées PDO systématiques</td></tr>
+        <tr><td>XSS</td><td><code>htmlspecialchars</code> sur les sorties utilisateur</td></tr>
+        <tr><td>Mots de passe</td><td><code>password_hash</code> / <code>password_verify</code> (bcrypt) ; règle de complexité à l'inscription</td></tr>
+        <tr><td>Fixation de session</td><td><code>session_regenerate_id(true)</code> à la connexion</td></tr>
+        <tr><td>Contrôle d'accès</td><td>Vérification du rôle (<code>includes/auth-role.php</code>) sur admin/employé</td></tr>
+        <tr><td>Création admin</td><td>Interdite dans l'UI ; admin uniquement en fixtures SQL</td></tr>
+        <tr><td>Reset MDP</td><td>Token unique + expiration en base</td></tr>
+        <tr><td>Secrets</td><td>Variables d'environnement Vercel / <code>config/local.php</code> (gitignoré)</td></tr>
+        <tr><td>Messages d'auth</td><td>Message d'erreur volontairement vague (pas d'énumération d'emails)</td></tr>
+        <tr><td>Install cloud</td><td>Route <code>install.php</code> protégée par clé</td></tr>
+    </tbody>
+</table>
+<p class="note"><strong>Limite connue (Vercel serverless) :</strong> les sessions PHP fichiers peuvent être instables entre lambdas froides. Acceptable pour la démo ECF ; en production durable → sessions Redis/DB.</p>
+
+<h2>8. Déploiement — démarche réalisée</h2>
+<ol>
+    <li>Préparer le runtime PHP sur Vercel (<code>vercel.json</code>, <code>api/index.php</code>, Composer/PHPMailer).</li>
+    <li>Provisionner MySQL sur Railway (TCP Proxy public <code>*.proxy.rlwy.net</code>).</li>
+    <li>Configurer les variables <code>DB_*</code> / <code>DATABASE_URL</code> sur Vercel (Production + Preview).</li>
+    <li>Déployer (<code>vercel --prod</code>) → alias <code>ecf-vite-et-gourmand-self.vercel.app</code>.</li>
+    <li>Exécuter une fois <code>/install.php?key=vitegourmand2026</code> pour créer schéma + fixtures.</li>
+    <li>Valider les parcours admin / employé / client.</li>
+</ol>
+<p>Détails complémentaires : <code>README.md</code>, <code>DEPLOIEMENT-ECF.md</code>.</p>
+
+<h2>9. Structure Git</h2>
+<ul>
+    <li><code>main</code> — version stable / production</li>
+    <li><code>develop</code> — intégration</li>
+    <li><code>feature/*</code> — une branche par fonctionnalité, merge vers <code>develop</code> après tests, puis <code>develop</code> → <code>main</code></li>
+</ul>
+
+<p style="margin-top:2rem;color:#6c757d;font-size:.85rem;">Documentation technique — ECF Vite &amp; Gourmand.</p>
+</body>
+</html>
