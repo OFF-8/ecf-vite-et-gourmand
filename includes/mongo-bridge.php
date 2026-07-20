@@ -41,7 +41,7 @@ function mongoBridgeRequest(string $method, array $payload = [], array $query = 
         }
         $raw = curl_exec($ch);
         $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        unset($ch); // PHP 8.5 : curl_close() est déprécié
         if ($raw === false || $code >= 400) {
             return null;
         }
