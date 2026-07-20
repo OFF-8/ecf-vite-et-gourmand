@@ -1,7 +1,10 @@
 {
   "name": "ecf-vite-et-gourmand",
   "private": true,
+  "dependencies": {
+    "mongodb": "^6.8.0"
+  },
   "scripts": {
-    "vercel-build": "git clone --depth 1 https://github.com/PHPMailer/PHPMailer.git vendor/phpmailer/phpmailer && mkdir -p public/asset && cp -r asset/* public/asset/"
+    "vercel-build": "mkdir -p public/asset && cp -r asset/* public/asset/"
   }
 }

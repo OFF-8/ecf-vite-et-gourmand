@@ -19,7 +19,12 @@ function getBasePath(): string
 
 function getBaseUrl(): string
 {
-    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $forwarded = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '';
+    $protocol = (
+        (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || $forwarded === 'https'
+        || env('VERCEL') === '1'
+    ) ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 
     return $protocol . '://' . $host . getBasePath();

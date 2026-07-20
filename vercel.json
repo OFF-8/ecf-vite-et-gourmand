@@ -5,9 +5,13 @@
     "api/**/*.php": {
       "runtime": "vercel-php@0.9.0",
       "maxDuration": 60
+    },
+    "api/mongo-stats.js": {
+      "maxDuration": 30
     }
   },
   "rewrites": [
+    { "source": "/api/mongo-stats", "destination": "/api/mongo-stats" },
     { "source": "/install.php", "destination": "/api/install.php" },
     { "source": "/asset/(.*)", "destination": "/asset/$1" },
     { "source": "/(.*)", "destination": "/api/index.php" }

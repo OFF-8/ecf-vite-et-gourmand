@@ -4,6 +4,7 @@ require_once __DIR__ . '/../includes/auth-role.php';
 requireRole(['administrateur']);
 
 require_once __DIR__ . '/../config/mongodb.php';
+require_once __DIR__ . '/../includes/mongo-bridge.php';
 
 $filtreMenu = (int) ($_GET['menu'] ?? 0);
 $filtreDebut = $_GET['debut'] ?? '';
@@ -16,40 +17,62 @@ $counts = [];
 $cas = [];
 $caTotal = 0;
 $erreurMongo = '';
+$docs = [];
 
-if (!$mongoManager) {
-    $erreurMongo = 'MongoDB non disponible. Vérifiez l\'installation et l\'extension PHP mongodb.';
-} else {
-    $filter = [];
-    if ($filtreMenu > 0) {
-        $filter['id_menu'] = $filtreMenu;
+if ($mongoManager) {
+    try {
+        $filter = [];
+        if ($filtreMenu > 0) {
+            $filter['id_menu'] = $filtreMenu;
+        }
+        $query = new MongoDB\Driver\Query($filter);
+        $cursor = $mongoManager->executeQuery("$mongoDatabase.$mongoCollection", $query);
+        foreach ($cursor as $doc) {
+            $docs[] = [
+                'id_menu' => (int) $doc->id_menu,
+                'menu_titre' => (string) $doc->menu_titre,
+                'montant' => (float) $doc->montant,
+                'date_commande' => $doc->date_commande->toDateTime()->format('Y-m-d'),
+            ];
+        }
+    } catch (Throwable $e) {
+        $erreurMongo = 'Erreur lecture MongoDB (extension) : ' . $e->getMessage();
     }
+} else {
+    $query = [];
+    if ($filtreMenu > 0) {
+        $query['menu'] = $filtreMenu;
+    }
+    $bridgeDocs = mongoBridgeRequest('GET', [], $query);
+    if ($bridgeDocs === null) {
+        $erreurMongo = 'MongoDB non disponible via le pont Vercel. Vérifiez MONGO_URI et /api/mongo-stats.';
+    } else {
+        $docs = $bridgeDocs;
+    }
+}
 
-    $query = new MongoDB\Driver\Query($filter);
-    $cursor = $mongoManager->executeQuery("$mongoDatabase.$mongoCollection", $query);
-
+if (!$erreurMongo) {
     $aggregation = [];
-    foreach ($cursor as $doc) {
-        $dateStr = $doc->date_commande->toDateTime()->format('Y-m-d');
-
-        if ($filtreDebut !== '' && $dateStr < $filtreDebut) {
+    foreach ($docs as $doc) {
+        $dateStr = $doc['date_commande'] ?? '';
+        if ($filtreDebut !== '' && $dateStr !== '' && $dateStr < $filtreDebut) {
             continue;
         }
-        if ($filtreFin !== '' && $dateStr > $filtreFin) {
+        if ($filtreFin !== '' && $dateStr !== '' && $dateStr > $filtreFin) {
             continue;
         }
 
-        $key = $doc->id_menu;
+        $key = (int) ($doc['id_menu'] ?? 0);
         if (!isset($aggregation[$key])) {
             $aggregation[$key] = [
-                'titre' => $doc->menu_titre,
+                'titre' => (string) ($doc['menu_titre'] ?? 'Menu'),
                 'count' => 0,
-                'ca' => 0,
+                'ca' => 0.0,
             ];
         }
         $aggregation[$key]['count']++;
-        $aggregation[$key]['ca'] += $doc->montant;
-        $caTotal += $doc->montant;
+        $aggregation[$key]['ca'] += (float) ($doc['montant'] ?? 0);
+        $caTotal += (float) ($doc['montant'] ?? 0);
     }
 
     foreach ($aggregation as $stat) {
@@ -107,7 +130,7 @@ require __DIR__ . '/../includes/header.php';
         <tr>
             <td><?= htmlspecialchars($labels[$i]) ?></td>
             <td><?= $counts[$i] ?></td>
-            <td><?= number_format($cas[$i], 2, ',', ' ') ?> €</td>
+            <td><?= number_format($cas[$i], 2, ',', ' ') ?></td>
         </tr>
         <?php endfor; ?>
     </tbody>
@@ -125,7 +148,7 @@ new Chart(ctx, {
         datasets: [{
             label: 'Nombre de commandes',
             data: <?= json_encode($counts) ?>,
-            backgroundColor: 'rgba(54, 162, 235, 0.6)'
+            backgroundColor: 'rgba(107, 44, 62, 0.65)'
         }]
     },
     options: {
